@@ -1,0 +1,166 @@
+:root {
+    --primary-color: #6F4E37; /* لون القهوة */
+    --secondary-color: #A67B5B;
+    --bg-color: #F5F5DC; /* بيج كريمي */
+    --text-color: #333;
+    --white: #ffffff;
+    --border-color: #ddd;
+    --success: #28a745;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    margin: 0;
+    padding: 0;
+    direction: rtl;
+}
+
+/* Header */
+.main-header {
+    background-color: var(--primary-color);
+    color: var(--white);
+    padding: 15px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+.main-header h1 {
+    margin: 0;
+    font-size: 1.5rem;
+}
+
+.nav-btn {
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.3);
+    color: var(--white);
+    padding: 8px 15px;
+    margin-left: 10px;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: 0.3s;
+}
+
+.nav-btn:hover, .nav-btn.active {
+    background-color: var(--secondary-color);
+    border-color: var(--white);
+}
+
+/* Container */
+.container {
+    padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* Cards & Layout */
+.card {
+    background: var(--white);
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.mt-20 { margin-top: 20px; }
+
+/* POS Layout */
+.pos-layout {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 20px;
+}
+
+.product-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 15px;
+}
+
+.invoice-panel {
+    background: var(--white);
+    padding: 20px;
+    border-radius: 8px;
+    height: fit-content;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* Tables */
+.invoice-table, .data-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+.invoice-table th, .invoice-table td, 
+.data-table th, .data-table td {
+    padding: 10px;
+    border-bottom: 1px solid var(--border-color);
+    text-align: right;
+}
+
+.invoice-table th {
+    background-color: #f8f8f8;
+}
+
+/* Forms & Inputs */
+input {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    margin-left: 10px;
+}
+
+.form-inline {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+.form-group input {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* Buttons */
+.btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1rem;
+}
+
+.btn-primary { background-color: var(--primary-color); color: var(--white); }
+.btn-success { background-color: var(--success); color: var(--white); }
+.btn-block { width: 100%; margin-top: 15px; }
+
+/* Footer */
+.invoice-footer {
+    margin-top: 20px;
+    border-top: 2px solid var(--primary-color);
+    padding-top: 10px;
+}
+
+.total-row {
+    font-size: 1.2rem;
+    font-weight: bold;
+    display: flex;
+    justify-content: space-between;
+}
+
+.status-indicator {
+    margin-top: 10px;
+    font-style: italic;
+    color: #666;
+}

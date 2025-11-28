@@ -1,0 +1,5 @@
+{
+  "name": "Copy of Coffee Roastery POS",
+  "description": "An offline-first accounting and POS system for a coffee roastery using Electron and PouchDB.",
+  "requestFramePermissions": []
+}

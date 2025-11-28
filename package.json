@@ -1,0 +1,23 @@
+{
+  "name": "coffee-roastery-pos",
+  "version": "1.0.0",
+  "description": "Offline-first Coffee Roastery System",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "keywords": [
+    "electron",
+    "pouchdb",
+    "pos",
+    "offline"
+  ],
+  "author": "Expert Developer",
+  "license": "ISC",
+  "dependencies": {
+    "pouchdb-browser": "^8.0.0"
+  },
+  "devDependencies": {
+    "electron": "^30.0.0"
+  }
+}

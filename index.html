@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نظام محمصة القهوة - نقاط البيع</title>
+    
+    <!-- ربط ملف التنسيق -->
+    <link rel="stylesheet" href="renderer/style.css">
+    <style>
+        /* Login Screen Styles */
+        #login-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--bg-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .login-box {
+            background: white;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            width: 350px;
+            text-align: center;
+        }
+        .login-box h2 {
+            color: var(--primary-color);
+            margin-bottom: 20px;
+        }
+        .login-box input {
+            width: 100%;
+            margin-bottom: 15px;
+            box-sizing: border-box;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- شاشة تسجيل الدخول -->
+    <div id="login-screen">
+        <div class="login-box">
+            <h2>☕ تسجيل الدخول</h2>
+            <form id="login-form">
+                <div class="form-group">
+                    <label style="text-align: right;">اسم المستخدم</label>
+                    <input type="text" id="login-username" required>
+                </div>
+                <div class="form-group">
+                    <label style="text-align: right;">كلمة المرور</label>
+                    <input type="password" id="login-password" required>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">دخول</button>
+            </form>
+            <p id="login-error" style="color: red; margin-top: 10px; display: none;"></p>
+        </div>
+    </div>
+
+    <!-- محتوى التطبيق الرئيسي (مخفي افتراضياً) -->
+    <div id="app-content" style="display: none;">
+        <!-- الهيدر -->
+        <header class="main-header">
+            <div style="display: flex; align-items: center;">
+                <h1 style="margin-left: 20px;">☕ نظام محمصة القهوة</h1>
+                <span id="user-display" style="font-size: 0.9rem; background: rgba(255,255,255,0.2); padding: 5px 10px; border-radius: 15px;"></span>
+            </div>
+            <nav>
+                <button class="nav-btn active" onclick="showSection('sales', this)">نقطة البيع</button>
+                <button class="nav-btn" onclick="showSection('products', this)">المنتجات</button>
+                <button class="nav-btn" onclick="showSection('purchases', this)">المشتريات</button>
+                <button class="nav-btn" onclick="showSection('expenses', this)">المصروفات</button>
+                <button class="nav-btn" onclick="showSection('customers', this)">العملاء</button>
+                <button class="nav-btn" onclick="showSection('reports', this)">التقارير</button>
+                <button class="nav-btn admin-only" onclick="showSection('settings', this)">الإعدادات</button>
+                <button class="nav-btn" style="background: #d9534f; border-color: #d9534f;" onclick="logout()">خروج</button>
+            </nav>
+        </header>
+
+        <div class="container">
+            
+            <!-- قسم المبيعات (الفاتورة) -->
+            <section id="sales" class="view-section active">
+                <h2>🛒 فاتورة بيع جديدة</h2>
+                
+                <div style="margin-bottom: 20px;">
+                    <label>بحث سريع / اختيار منتج:</label>
+                    <select id="pos-product-select" style="width: 100%; padding: 10px; font-size: 1.1rem;">
+                        <option value="">-- اختر منتجاً للإضافة --</option>
+                    </select>
+                </div>
+
+                <div class="pos-layout">
+                    <div class="product-grid">
+                        <!-- Placeholder logic if needed, currently list mode mainly -->
+                        <div style="grid-column: span 3; text-align: center; color: #888;">
+                            قم باختيار المنتج من القائمة أعلاه لإضافته للفاتورة
+                        </div>
+                    </div>
+                    
+                    <div class="invoice-panel">
+                        <h3>ملخص الطلب</h3>
+                        <table class="invoice-table">
+                            <thead>
+                                <tr>
+                                    <th>المنتج</th>
+                                    <th>الكمية</th>
+                                    <th>السعر</th>
+                                    <th>حذف</th>
+                                </tr>
+                            </thead>
+                            <tbody id="invoice-items">
+                                <!-- بنود الفاتورة -->
+                            </tbody>
+                        </table>
+                        <div class="invoice-footer">
+                            <div class="total-row">
+                                <span>الإجمالي:</span>
+                                <span id="total-price">0.00</span> ريال
+                            </div>
+                            <button class="btn btn-primary btn-block">إتمام البيع وحفظ</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- قسم المشتريات -->
+            <section id="purchases" class="view-section" style="display: none;">
+                <h2>🚚 فاتورة مشتريات (توريد مخزون)</h2>
+                <div class="pos-layout">
+                    <div class="card" style="height: fit-content;">
+                        <h3>إضافة بند للفاتورة</h3>
+                        <div class="form-group">
+                            <label>المنتج</label>
+                            <select id="purchase-product-select" style="width:100%; padding:10px;">
+                                <option value="">-- اختر منتج --</option>
+                            </select>
+                        </div>
+                        <div class="form-inline">
+                            <div class="form-group" style="flex:1">
+                                <label>الكمية</label>
+                                <input type="number" id="purchase-qty" value="1" min="1">
+                            </div>
+                            <div class="form-group" style="flex:1">
+                                <label>سعر التكلفة</label>
+                                <input type="number" id="purchase-cost" step="0.01" placeholder="0.00">
+                            </div>
+                        </div>
+                        <button onclick="addItemToPurchase()" class="btn btn-primary btn-block">إضافة للقائمة</button>
+                    </div>
+
+                    <div class="invoice-panel">
+                        <h3>بيانات الفاتورة</h3>
+                        <div class="form-group">
+                            <label>اسم المورد:</label>
+                            <input type="text" id="purchase-supplier" placeholder="أدخل اسم المورد">
+                        </div>
+
+                        <table class="invoice-table">
+                            <thead>
+                                <tr>
+                                    <th>المنتج</th>
+                                    <th>الكمية</th>
+                                    <th>ت.الوحدة</th>
+                                    <th>الإجمالي</th>
+                                    <th>حذف</th>
+                                </tr>
+                            </thead>
+                            <tbody id="purchase-items">
+                            </tbody>
+                        </table>
+                        <div class="invoice-footer">
+                            <div class="total-row">
+                                <span>إجمالي التكلفة:</span>
+                                <span id="purchase-total-price">0.00</span> ريال
+                            </div>
+                            <button id="save-purchase-btn" class="btn btn-success btn-block">حفظ المشتريات وتحديث المخزون</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- قسم المصروفات -->
+            <section id="expenses" class="view-section" style="display: none;">
+                <h2>💸 إدارة المصروفات</h2>
+                <div class="card">
+                    <h3>تسجيل مصروف جديد</h3>
+                    <form id="add-expense-form" class="form-inline" style="align-items: flex-end;">
+                        <div class="form-group" style="flex:1">
+                            <label>فئة المصروف</label>
+                            <input type="text" id="exp-category" placeholder="مثلاً: إيجار، كهرباء..." required>
+                        </div>
+                        <div class="form-group" style="flex:1">
+                            <label>المبلغ</label>
+                            <input type="number" id="exp-amount" placeholder="0.00" step="0.01" required>
+                        </div>
+                        <div class="form-group" style="flex:2">
+                            <label>ملاحظات</label>
+                            <input type="text" id="exp-note" placeholder="تفاصيل إضافية">
+                        </div>
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-success" style="height: 42px;">حفظ المصروف</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="card mt-20">
+                    <h3>آخر 20 مصروف</h3>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>التاريخ</th>
+                                <th>الفئة</th>
+                                <th>المبلغ</th>
+                                <th>ملاحظات</th>
+                                <th>إجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody id="expenses-list-body"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- قسم العملاء -->
+            <section id="customers" class="view-section" style="display: none;">
+                <h2>👥 دليل العملاء</h2>
+                <div class="card">
+                    <h3>إضافة عميل جديد</h3>
+                    <form id="add-customer-form" class="form-inline" style="align-items: flex-end;">
+                        <div class="form-group" style="flex:2">
+                            <label>اسم العميل</label>
+                            <input type="text" id="cust-name" placeholder="الاسم الكامل" required>
+                        </div>
+                        <div class="form-group" style="flex:1">
+                            <label>رقم الجوال</label>
+                            <input type="text" id="cust-phone" placeholder="05xxxxxxxx">
+                        </div>
+                        <div class="form-group" style="flex:1">
+                            <label>الرصيد الافتتاحي</label>
+                            <input type="number" id="cust-balance" placeholder="0.00" step="0.01">
+                        </div>
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-primary" style="height: 42px;">إضافة عميل</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="card mt-20">
+                    <h3>قائمة العملاء</h3>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>اسم العميل</th>
+                                <th>رقم الجوال</th>
+                                <th>الرصيد الحالي</th>
+                                <th>إجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody id="customers-list-body"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- قسم المنتجات -->
+            <section id="products" class="view-section" style="display: none;">
+                <h2>📦 إدارة المخزون والمنتجات</h2>
+                <div class="card">
+                    <h3>إضافة منتج جديد</h3>
+                    <form id="add-product-form" class="form-inline" style="align-items: flex-end;">
+                        <div class="form-group">
+                            <label>الاسم</label>
+                            <input type="text" id="p-name" placeholder="اسم المنتج" required>
+                        </div>
+                        <div class="form-group">
+                            <label>سعر البيع</label>
+                            <input type="number" id="p-price" placeholder="سعر البيع" step="0.01" required>
+                        </div>
+                        <div class="form-group">
+                            <label>الوحدة</label>
+                            <input type="text" id="p-unit" placeholder="كجم، حبة..." required>
+                        </div>
+                        <div class="form-group">
+                            <label>التصنيف</label>
+                            <input type="text" id="p-category" placeholder="التصنيف">
+                        </div>
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-success" style="height: 42px;">حفظ المنتج</button>
+                        </div>
+                    </form>
+                </div>
+                <div class="card mt-20">
+                    <h3>قائمة المنتجات الحالية</h3>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>الاسم</th>
+                                <th>التصنيف</th>
+                                <th>سعر البيع</th>
+                                <th>الوحدة</th>
+                                <th>المخزون المتوفر</th>
+                                <th>إجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody id="products-list-body"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- قسم التقارير -->
+            <section id="reports" class="view-section" style="display: none;">
+                <h2>📈 التقارير المالية والمخزنية</h2>
+                
+                <div class="card mb-20" style="margin-bottom: 20px;">
+                    <div class="form-inline">
+                        <label>اختر التاريخ للتقرير اليومي:</label>
+                        <input type="date" id="report-date-input">
+                        <button class="btn btn-primary" onclick="generateDailyReport()">عرض التقرير</button>
+                    </div>
+                </div>
+
+                <div class="pos-layout">
+                    <!-- ملخص اليوم -->
+                    <div style="flex: 2;">
+                        <div class="card" style="background: #e3f2fd; margin-bottom: 10px;">
+                            <h3>💰 ملخص اليوم</h3>
+                            <div class="form-inline" style="justify-content: space-around;">
+                                <div style="text-align: center;">
+                                    <h4>المبيعات</h4>
+                                    <span id="report-sales-total" style="font-size: 1.5rem; color: green; font-weight: bold;">0.00</span> ريال
+                                    <br><small id="report-sales-count">عدد الفواتير: 0</small>
+                                </div>
+                                <div style="text-align: center;">
+                                    <h4>المصروفات</h4>
+                                    <span id="report-expenses-total" style="font-size: 1.5rem; color: red; font-weight: bold;">0.00</span> ريال
+                                    <br><small id="report-expenses-count">عدد المصروفات: 0</small>
+                                </div>
+                                <div style="text-align: center;">
+                                    <h4>الصافي</h4>
+                                    <span id="report-net-total" style="font-size: 1.5rem; color: blue; font-weight: bold;">0.00</span> ريال
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <h4>تفاصيل المبيعات</h4>
+                            <table class="data-table">
+                                <thead><tr><th>رقم الفاتورة</th><th>الوقت</th><th>المبلغ</th></tr></thead>
+                                <tbody id="report-sales-body"></tbody>
+                            </table>
+                            
+                            <h4 style="margin-top: 20px;">تفاصيل المصروفات</h4>
+                            <table class="data-table">
+                                <thead><tr><th>الوقت</th><th>الفئة</th><th>المبلغ</th></tr></thead>
+                                <tbody id="report-expenses-body"></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- تقرير المخزون -->
+                    <div style="flex: 1;">
+                        <div class="card">
+                            <div class="form-inline" style="justify-content: space-between; margin-bottom: 10px;">
+                                <h3>📦 جرد المخزون</h3>
+                                <button class="btn btn-success" style="padding: 5px 10px; font-size: 0.9rem;" onclick="generateInventoryReport()">تحديث</button>
+                            </div>
+                            <table class="data-table">
+                                <thead><tr><th>المنتج</th><th>الوحدة</th><th>الكمية</th></tr></thead>
+                                <tbody id="report-inventory-body"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- قسم الإعدادات (المزامنة + المستخدمين) -->
+            <section id="settings" class="view-section" style="display: none;">
+                <h2>⚙️ الإعدادات العامة</h2>
+                
+                <!-- إعدادات المزامنة -->
+                <div class="card" style="max-width: 800px; margin: 0 auto;">
+                    <h3>ربط قاعدة البيانات (Remote CouchDB)</h3>
+                    <p style="color: #666; margin-bottom: 15px;">
+                        قم بإدخال رابط الخادم البعيد للمزامنة. الصيغة عادة تكون:<br>
+                        <code style="direction: ltr; display: block; background: #f5f5f5; padding: 5px;">http://127.0.0.1:5984/coffee_db</code>
+                    </p>
+                    
+                    <div class="form-group">
+                        <label>رابط الخادم (Remote URL):</label>
+                        <input type="text" id="remote-url-input" placeholder="http://localhost:5984/coffee_db" style="width: 100%; direction: ltr; font-family: monospace;">
+                    </div>
+                    
+                    <div class="form-inline" style="margin-top: 20px;">
+                        <button id="save-url-btn" class="btn btn-primary">حفظ الرابط</button>
+                        <button id="sync-now-btn" class="btn btn-success">مزامنة الآن 🔄</button>
+                    </div>
+
+                    <div id="sync-status" style="margin-top: 20px; padding: 15px; background: #f8f9fa; border: 1px solid #ddd; border-radius: 4px; text-align: center; font-weight: bold;">
+                        حالة المزامنة: جاهز
+                    </div>
+                </div>
+
+                <!-- إدارة المستخدمين -->
+                <div class="card mt-20" style="max-width: 800px; margin: 20px auto;">
+                    <h3>إدارة المستخدمين</h3>
+                    <div style="background: #f9f9f9; padding: 15px; border-radius: 4px; border: 1px solid #eee; margin-bottom: 20px;">
+                        <h4>إضافة مستخدم جديد</h4>
+                        <form id="create-user-form" class="form-inline" style="align-items: flex-end;">
+                            <div class="form-group">
+                                <label>اسم المستخدم</label>
+                                <input type="text" id="new-username" required>
+                            </div>
+                            <div class="form-group">
+                                <label>كلمة المرور</label>
+                                <input type="password" id="new-password" required>
+                            </div>
+                            <div class="form-group">
+                                <label>الصلاحية</label>
+                                <select id="new-role" style="padding: 10px; border: 1px solid #ccc; border-radius: 4px; width: 150px;">
+                                    <option value="cashier">كاشير</option>
+                                    <option value="admin">مدير</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <button type="submit" class="btn btn-primary" style="height: 42px;">إضافة</button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <h3>قائمة المستخدمين المسجلين</h3>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>اسم المستخدم</th>
+                                <th>الصلاحية</th>
+                                <th>تاريخ الإنشاء</th>
+                                <th>إجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody id="users-list-body"></tbody>
+                    </table>
+                </div>
+            </section>
+
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script>
+        function showSection(id, btn) {
+            // إخفاء جميع الأقسام
+            document.querySelectorAll('.view-section').forEach(sec => sec.style.display = 'none');
+            // إظهار القسم المطلوب
+            const target = document.getElementById(id);
+            if (target) target.style.display = 'block';
+
+            // تحديث حالة الأزرار
+            if (btn) {
+                document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+            }
+        }
+    </script>
+    <script src="renderer/config.js"></script>
+    <script src="renderer/app.js"></script>
+</body>
+</html>
